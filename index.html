@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deja un mensaje para los novios</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="fullscreen">
+  <header>
+    <h1>Deja un mensaje para los novios <span>💖</span></h1>
+    <nav>
+      <button id="hamburgerMenu" aria-label="Open navigation menu">&#9776;</button>
+      <ul id="navList" class="hidden">
+        <li><a href="#" onclick="mostrarSeccion('inicio'); return false;">Inicio</a></li>
+        <li><a href="#" onclick="mostrarSeccion('galeria'); return false;">Galería</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Contenedor donde se cambiará el contenido sin recargar -->
+  <main>
+    <section id="inicio">
+      <video id="video" autoplay muted playsinline></video>
+      <button id="recordButton" class="record"><span>Grabar</span></button>
+    </section>
+
+    <section id="galeria" class="hidden">
+      <div id="videoGallery"></div>
+      <button id="downloadSelected">Descargar Seleccionados</button>
+      <button id="downloadAll">Descargar Todo</button>
+    </section>
+  </main>
+
+  <script src="scripts.js"></script>
+<!-- Popup de confirmación -->
+<div id="deletePopup" class="popup hidden">
+    <div class="popup-content">
+        <p>¿Seguro que quieres eliminar este video?</p>
+        <div class="popup-buttons">
+            <button id="confirmDelete">Eliminar</button>
+            <button id="cancelDelete">Cancelar</button>
+        </div>
+    </div>
+</div>
+<!-- 🔹 Popup de advertencia bonito -->
+<div id="alertPopup" class="popup hidden">
+    <div class="popup-content">
+        <p id="alertMessage"></p>
+        <div class="popup-buttons">
+            <button id="closeAlert">Aceptar</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
