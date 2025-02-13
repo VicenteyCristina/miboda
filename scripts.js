@@ -116,7 +116,7 @@ function showPreview(blob) {
     const previewPopup = document.createElement('div');
     previewPopup.id = 'previewPopup';
     previewPopup.innerHTML = `
-        <video id="previewVideo" controls playsinline></video>
+        <video id="previewVideo" controls playsinline muted></video>
         <canvas id="videoCanvas" style="display:none;"></canvas>
         <div class="button-bar">
             <button id="acceptButton">Subir</button>
@@ -128,21 +128,19 @@ function showPreview(blob) {
     const videoElement = document.getElementById('previewVideo');
     const canvas = document.getElementById('videoCanvas');
     const ctx = canvas.getContext('2d');
-    
+
     videoElement.src = url;
-    
-    videoElement.addEventListener('loadedmetadata', () => {
-        videoElement.currentTime = 0.1; // Ir un poco adelante
+    videoElement.load();
+
+    videoElement.addEventListener('loadeddata', () => {
+        videoElement.currentTime = 0.1; // Intenta capturar un frame del inicio
     });
 
     videoElement.addEventListener('seeked', () => {
         canvas.width = videoElement.videoWidth;
         canvas.height = videoElement.videoHeight;
         ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-
-        // Aplicar la imagen capturada como poster
-        const frameImage = canvas.toDataURL('image/png');
-        videoElement.poster = frameImage;
+        videoElement.poster = canvas.toDataURL("image/png"); // Aplica el primer frame como poster
     });
 
     document.getElementById('acceptButton').addEventListener('click', () => {
@@ -155,6 +153,7 @@ function showPreview(blob) {
         closePreview(previewPopup, overlay);
     });
 }
+
 
 
 function closePreview(popup, overlay) {
