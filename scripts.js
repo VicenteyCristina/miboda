@@ -151,7 +151,7 @@ let refreshToken = "1//04WEszCdAKh4VCgYIARAAGAQSNwF-L9IrgR4dOdinePjH22c3vF4_kofo
 let clientId = "73869033113-95k69il9h59q5s9jmf3p25ve56ajs6dd.apps.googleusercontent.com"; // Reemplaza con tu Client ID
 let clientSecret = "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"; // Reemplaza con tu Client Secret
 
-aasync function refreshAccessToken() {
+async function refreshAccessToken() {
     try {
         let response = await fetch("https://oauth2.googleapis.com/token", {
             method: "POST",
