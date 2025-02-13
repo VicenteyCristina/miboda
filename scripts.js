@@ -107,6 +107,8 @@ function updateTimerDisplay() {
 }
 
 
+
+
 function showPreview(blob) {
     const url = URL.createObjectURL(blob);
     const overlay = document.createElement('div');
@@ -115,93 +117,33 @@ function showPreview(blob) {
 
     const previewPopup = document.createElement('div');
     previewPopup.id = 'previewPopup';
+    previewPopup.innerHTML = `
+        <video id="previewVideo" controls></video>
+        <div class="button-bar">
+            <button id="acceptButton">Subir</button>
+            <button id="deleteButton">Eliminar</button>
+        </div>
+    `;
+    document.body.appendChild(previewPopup);
 
-    const video = document.createElement('video');
-    video.src = url;
-    video.muted = true;
-    video.playsInline = true;
-    video.controls = true;
-    video.style.display = "none"; // Ocultamos el video hasta que se le dé play
+    const previewVideo = document.getElementById('previewVideo');
 
-    const img = document.createElement('img');
-    img.style.width = "100%";
-    img.style.borderRadius = "10px";
-    img.alt = "Miniatura del video";
+    // Retraso para mejorar la carga de miniatura en algunos dispositivos
+    setTimeout(() => {
+        previewVideo.src = url;
+        previewVideo.load(); // Asegura que se procese correctamente el video
+    }, 1000); // Espera 1 segundo antes de asignar la fuente
 
-    video.addEventListener('loadeddata', async () => {
-        await delay(500); // 🔹 Espera un poco más para asegurarse de que el video esté cargado
-        video.currentTime = 0.1; // 🔹 Avanzamos un poco el video antes de capturar
-        video.addEventListener("seeked", function captureFrame() {
-            if (captureThumbnail(video, img)) {
-                video.removeEventListener("seeked", captureFrame); // 🔹 Captura exitosa, removemos el evento
-            } else {
-                console.log("🔹 Reintentando captura...");
-                video.currentTime += 0.1; // 🔹 Si salió negro, intentamos un poco más adelante
-            }
-        });
-    });
-
-    const buttonBar = document.createElement('div');
-    buttonBar.classList.add('button-bar');
-
-    const acceptButton = document.createElement('button');
-    acceptButton.id = 'acceptButton';
-    acceptButton.textContent = 'Subir';
-    acceptButton.addEventListener('click', () => {
+    document.getElementById('acceptButton').addEventListener('click', () => {
         uploadToDrive(blob);
         closePreview(previewPopup, overlay);
     });
 
-    const deleteButton = document.createElement('button');
-    deleteButton.id = 'deleteButton';
-    deleteButton.textContent = 'Eliminar';
-    deleteButton.addEventListener('click', () => {
+    document.getElementById('deleteButton').addEventListener('click', () => {
         URL.revokeObjectURL(url);
         closePreview(previewPopup, overlay);
     });
-
-    buttonBar.appendChild(acceptButton);
-    buttonBar.appendChild(deleteButton);
-
-    previewPopup.appendChild(img); // 🔹 Mostramos la miniatura primero
-    previewPopup.appendChild(video);
-    previewPopup.appendChild(buttonBar);
-    document.body.appendChild(previewPopup);
-
-    // Cuando se haga clic en la imagen, mostramos el video
-    img.addEventListener("click", () => {
-        img.style.display = "none";
-        video.style.display = "block";
-        video.play();
-    });
 }
-
-// Función para capturar una miniatura
-function captureThumbnail(video, imgElement) {
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext('2d');
-
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const allBlack = imageData.data.every(channel => channel === 0); // Comprobar si la imagen es negra
-
-    if (!allBlack) {
-        imgElement.src = canvas.toDataURL('image/png');
-        return true;
-    }
-    return false; // Si es negro, devolvemos falso y volvemos a intentarlo
-}
-
-// Función de espera
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-
-
 
 
 
@@ -209,6 +151,9 @@ function closePreview(popup, overlay) {
     popup.remove();
     overlay.remove();
 }
+
+
+
 
 let accessToken = ""; // Se actualizará automáticamente
 let refreshToken = "1//04WEszCdAKh4VCgYIARAAGAQSNwF-L9IrgR4dOdinePjH22c3vF4_kofo8BRc9DoUpgrrQiiQ3BTkf1j-gZKXrYwqdXkAulrgjA4"; // Reemplaza con tu refresh token
