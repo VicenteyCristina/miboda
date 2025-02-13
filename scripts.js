@@ -107,8 +107,6 @@ function updateTimerDisplay() {
 }
 
 
-
-
 function showPreview(blob) {
     const url = URL.createObjectURL(blob);
     const overlay = document.createElement('div');
@@ -119,6 +117,7 @@ function showPreview(blob) {
     previewPopup.id = 'previewPopup';
     previewPopup.innerHTML = `
         <video id="previewVideo" controls playsinline></video>
+        <canvas id="videoCanvas" style="display:none;"></canvas>
         <div class="button-bar">
             <button id="acceptButton">Subir</button>
             <button id="deleteButton">Eliminar</button>
@@ -127,9 +126,24 @@ function showPreview(blob) {
     document.body.appendChild(previewPopup);
 
     const videoElement = document.getElementById('previewVideo');
+    const canvas = document.getElementById('videoCanvas');
+    const ctx = canvas.getContext('2d');
+    
     videoElement.src = url;
-    videoElement.poster = url; // Intenta usar el primer frame como miniatura
-    videoElement.load(); // 🚀 Forzar la carga del primer frame
+    
+    videoElement.addEventListener('loadedmetadata', () => {
+        videoElement.currentTime = 0.1; // Ir un poco adelante
+    });
+
+    videoElement.addEventListener('seeked', () => {
+        canvas.width = videoElement.videoWidth;
+        canvas.height = videoElement.videoHeight;
+        ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+        // Aplicar la imagen capturada como poster
+        const frameImage = canvas.toDataURL('image/png');
+        videoElement.poster = frameImage;
+    });
 
     document.getElementById('acceptButton').addEventListener('click', () => {
         uploadToDrive(blob);
@@ -142,14 +156,10 @@ function showPreview(blob) {
     });
 }
 
-
 function closePreview(popup, overlay) {
     popup.remove();
     overlay.remove();
 }
-
-
-
 
 let accessToken = ""; // Se actualizará automáticamente
 let refreshToken = "1//04WEszCdAKh4VCgYIARAAGAQSNwF-L9IrgR4dOdinePjH22c3vF4_kofo8BRc9DoUpgrrQiiQ3BTkf1j-gZKXrYwqdXkAulrgjA4"; // Reemplaza con tu refresh token
