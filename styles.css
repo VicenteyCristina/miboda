@@ -433,7 +433,7 @@ input[type="checkbox"] {
     position: absolute; /* Fijada en la pantalla */
     right: 0; /* Pegada al borde derecho */
     bottom: 0; /* Pegada al borde inferior */
-    height: 110vh; /* Ocupará toda la altura de la pantalla */
+    height: 130vh; /* Ocupará toda la altura de la pantalla */
     width: auto; /* Mantiene la proporción de la imagen */
     pointer-events: none; /* Evita que interfiera con clics */
     z-index: 3; /* Se asegura de estar por encima del fondo */
