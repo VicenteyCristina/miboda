@@ -147,9 +147,9 @@ function closePreview(popup, overlay) {
 
 
 let accessToken = ""; // Se actualizará automáticamente
-let refreshToken = "1//0484NjT_EPIEUCgYIARAAGAQSNwF-L9IrauX--VeAuLHL2sEc8S9tLQ1mYlM0sR07aElPXfuurPBYXxG7-NoewM-u_3DhVpJsM-c"; // Reemplaza con tu refresh token
-let clientId = "845853277449-hce0u2l3i8pb62650m2b66qd9ur7r8ai.apps.googleusercontent.com"; // Reemplaza con tu Client ID
-let clientSecret = "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"; // Reemplaza con tu Client Secret
+let refreshToken = "1//04WEszCdAKh4VCgYIARAAGAQSNwF-L9IrgR4dOdinePjH22c3vF4_kofo8BRc9DoUpgrrQiiQ3BTkf1j-gZKXrYwqdXkAulrgjA4"; // Reemplaza con tu refresh token
+let clientId = "73869033113-95k69il9h59q5s9jmf3p25ve56ajs6dd.apps.googleusercontent.com"; // Reemplaza con tu Client ID
+let clientSecret = "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"; // Reemplaza con tu Client Secret
 
 async function refreshAccessToken() {
     try {
