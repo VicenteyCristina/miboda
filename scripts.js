@@ -156,6 +156,7 @@ function showPreview(blob) {
     });
 }
 
+
 function closePreview(popup, overlay) {
     popup.remove();
     overlay.remove();
