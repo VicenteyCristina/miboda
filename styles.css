@@ -29,31 +29,7 @@ nav {
   position: relative;
 }
 
-#hamburgerMenu {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #d45d79;
-  display: block;
-}
 
-#navList {
-  list-style: none;
-  padding: 0;
-  position: absolute;
-  right: 0;
-  background-color: #fbe8e7;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-#navList a {
-  display: block;
-  padding: 10px 20px;
-  text-decoration: none;
-  color: #d45d79;
-  font-weight: bold;
-}
 
 main {
   display: flex;
@@ -85,7 +61,6 @@ video {
   background-color: black;
   border: none;
 }
-
 
 button.record {
   background-color: #d45d79;
