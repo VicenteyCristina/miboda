@@ -222,6 +222,6 @@ function mostrarMensaje(texto) {
 
     setTimeout(() => {
         mensaje.remove();
-    }, 25000); // 🔹 El mensaje desaparecerá después de 25 segundos
+    }, 10000); // 🔹 El mensaje desaparecerá después de 10 segundos
 }
 

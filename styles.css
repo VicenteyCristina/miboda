@@ -419,14 +419,13 @@ input[type="checkbox"] {
     background-color: #b03d5a; /* 🔹 Color más oscuro al pasar el mouse */
 }
 
-/* 🔹 Mensaje de éxito */
 #mensajeExito {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(255, 248, 248, 0.95); /* 🔹 Suave fondo acorde con la app */
-    color: #d45d79; /* 🔹 Mismo color que los botones */
+    background-color: rgba(255, 248, 248, 0.95); /* 🔹 Fondo acorde con la app */
+    color: #d45d79; /* 🔹 Color de los botones */
     padding: 15px 20px;
     border-radius: 10px;
     font-size: 18px;
@@ -434,8 +433,9 @@ input[type="checkbox"] {
     font-weight: bold;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
     z-index: 1000;
-    animation: fadeIn 0.5s ease-in-out, fadeOut 1.5s ease-in-out 25s;
+    animation: fadeIn 0.5s ease-in-out, fadeOut 1.5s ease-in-out 10s; /* 🔹 fadeOut inicia a los 10s */
 }
+
 
 /* 🔹 Animaciones para entrada y salida del mensaje */
 @keyframes fadeIn {
@@ -445,6 +445,7 @@ input[type="checkbox"] {
 
 @keyframes fadeOut {
     0% { opacity: 1; transform: translate(-50%, -50%); }
-    90% { opacity: 1; } /* Mantiene el mensaje visible hasta el 90% del tiempo */
+    90% { opacity: 1; } /* 🔹 Mantiene el mensaje visible el 90% del tiempo */
     100% { opacity: 0; transform: translate(-50%, -60%); }
 }
+
