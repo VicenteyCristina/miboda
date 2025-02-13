@@ -118,7 +118,7 @@ function showPreview(blob) {
     const previewPopup = document.createElement('div');
     previewPopup.id = 'previewPopup';
     previewPopup.innerHTML = `
-        <video controls src="${url}" poster="${url}"></video>
+        <video id="previewVideo" controls playsinline></video>
         <div class="button-bar">
             <button id="acceptButton">Subir</button>
             <button id="deleteButton">Eliminar</button>
@@ -126,8 +126,13 @@ function showPreview(blob) {
     `;
     document.body.appendChild(previewPopup);
 
+    const videoElement = document.getElementById('previewVideo');
+    videoElement.src = url;
+    videoElement.poster = url; // Intenta usar el primer frame como miniatura
+    videoElement.load(); // 🚀 Forzar la carga del primer frame
+
     document.getElementById('acceptButton').addEventListener('click', () => {
-        uploadToDrive(blob); // ✅ Ahora usa la función corregida
+        uploadToDrive(blob);
         closePreview(previewPopup, overlay);
     });
 
