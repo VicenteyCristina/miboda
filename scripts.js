@@ -147,7 +147,7 @@ function closePreview(popup, overlay) {
 
 
 let accessToken = ""; // Se actualizará automáticamente
-let refreshToken = "1//04WEszCdAKh4VCgYIARAAGAQSNwF-L9IrgR4dOdinePjH22c3vF4_kofo8BRc9DoUpgrrQiiQ3BTkf1j-gZKXrYwqdXkAulrgjA4"; // Reemplaza con tu refresh token
+let refreshToken = "ya29.a0AXeO80Q727hOvOnfRUK_lPki2w_A-grTC707twO39mqIspAO9GgCqdZw11sSjp91sEOEKQZ-KuSaw9TdBt17BZU12Z60AgxwkSkTQ4TPXMsGkPafjGUCgXLAFjnYtg6wVrdxkv25owoz6D9u0SbC5J8uGQlU5gEKNS7VWQCtaCgYKAUASARISFQHGX2MipAz4ZC9JFENf0DlraCweAg0175"; // Reemplaza con tu refresh token
 let clientId = "73869033113-95k69il9h59q5s9jmf3p25ve56ajs6dd.apps.googleusercontent.com"; // Reemplaza con tu Client ID
 let clientSecret = "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"; // Reemplaza con tu Client Secret
 
@@ -178,7 +178,6 @@ async function refreshAccessToken() {
 
 
 
-
 async function uploadToDrive(blob) {
     let timestamp = new Date().toISOString().replace(/[-:.]/g, "");
     let fileName = `video_${timestamp}.webm`;
@@ -204,13 +203,25 @@ async function uploadToDrive(blob) {
 
         let result = await response.json();
         if (response.ok) {
-            alert("✅ Video subido correctamente a Google Drive.");
+            mostrarMensaje("📩 ¡Mensaje recibido! No garantizamos que no lloraremos de emoción al verlo. 😭💖");
         } else {
-            alert(`❌ Error al subir: ${result.error.message}`);
+            mostrarMensaje(`❌ Error al subir: ${result.error.message}`);
         }
     } catch (error) {
-        alert("❌ Error al conectar con Google Drive.");
+        mostrarMensaje("❌ Error al conectar con Google Drive.");
         console.error(error);
     }
+}
+
+// 🔹 Función para mostrar el mensaje en pantalla durante 5 segundos con efecto fade out
+function mostrarMensaje(texto) {
+    const mensaje = document.createElement("div");
+    mensaje.id = "mensajeExito";
+    mensaje.innerHTML = `<p>${texto}</p>`;
+    document.body.appendChild(mensaje);
+
+    setTimeout(() => {
+        mensaje.remove();
+    }, 5000); // 🔹 El mensaje desaparecerá después de 5 segundos
 }
 
