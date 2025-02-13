@@ -115,44 +115,69 @@ function showPreview(blob) {
 
     const previewPopup = document.createElement('div');
     previewPopup.id = 'previewPopup';
-    previewPopup.innerHTML = `
-        <video id="previewVideo" controls playsinline muted></video>
-        <canvas id="videoCanvas" style="display:none;"></canvas>
-        <div class="button-bar">
-            <button id="acceptButton">Subir</button>
-            <button id="deleteButton">Eliminar</button>
-        </div>
-    `;
-    document.body.appendChild(previewPopup);
 
-    const videoElement = document.getElementById('previewVideo');
-    const canvas = document.getElementById('videoCanvas');
-    const ctx = canvas.getContext('2d');
+    // Crear el elemento de video para la previsualización
+    const video = document.createElement('video');
+    video.src = url;
+    video.muted = true;
+    video.playsInline = true;
+    video.controls = true;
 
-    videoElement.src = url;
-    videoElement.load();
-
-    videoElement.addEventListener('loadeddata', () => {
-        videoElement.currentTime = 0.1; // Intenta capturar un frame del inicio
+    // Intentar capturar un frame del video
+    video.addEventListener('loadeddata', () => {
+        setTimeout(() => {
+            captureThumbnail(video, previewPopup);
+        }, 500); // Esperar un poco para asegurar que el primer frame esté disponible
     });
 
-    videoElement.addEventListener('seeked', () => {
-        canvas.width = videoElement.videoWidth;
-        canvas.height = videoElement.videoHeight;
-        ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-        videoElement.poster = canvas.toDataURL("image/png"); // Aplica el primer frame como poster
-    });
+    const buttonBar = document.createElement('div');
+    buttonBar.classList.add('button-bar');
 
-    document.getElementById('acceptButton').addEventListener('click', () => {
+    const acceptButton = document.createElement('button');
+    acceptButton.id = 'acceptButton';
+    acceptButton.textContent = 'Subir';
+    acceptButton.addEventListener('click', () => {
         uploadToDrive(blob);
         closePreview(previewPopup, overlay);
     });
 
-    document.getElementById('deleteButton').addEventListener('click', () => {
+    const deleteButton = document.createElement('button');
+    deleteButton.id = 'deleteButton';
+    deleteButton.textContent = 'Eliminar';
+    deleteButton.addEventListener('click', () => {
         URL.revokeObjectURL(url);
         closePreview(previewPopup, overlay);
     });
+
+    buttonBar.appendChild(acceptButton);
+    buttonBar.appendChild(deleteButton);
+
+    previewPopup.appendChild(video);
+    previewPopup.appendChild(buttonBar);
+    document.body.appendChild(previewPopup);
 }
+
+// Función para capturar un frame y usarlo como miniatura
+function captureThumbnail(video, previewPopup) {
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+
+    // Dibujar el primer frame del video en el canvas
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Convertir el canvas en una imagen y colocarla como miniatura
+    const img = document.createElement('img');
+    img.src = canvas.toDataURL('image/png');
+    img.style.width = "100%";
+    img.style.borderRadius = "10px";
+
+    // Reemplazar el video con la imagen antes de que el usuario presione play
+    previewPopup.insertBefore(img, previewPopup.firstChild);
+}
+
+
 
 
 
