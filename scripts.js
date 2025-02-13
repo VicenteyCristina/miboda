@@ -116,18 +116,29 @@ function showPreview(blob) {
     const previewPopup = document.createElement('div');
     previewPopup.id = 'previewPopup';
 
-    // Crear el elemento de video para la previsualización
     const video = document.createElement('video');
     video.src = url;
     video.muted = true;
     video.playsInline = true;
     video.controls = true;
+    video.style.display = "none"; // Ocultamos el video hasta que se le dé play
 
-    // Intentar capturar un frame del video
-    video.addEventListener('loadeddata', () => {
-        setTimeout(() => {
-            captureThumbnail(video, previewPopup);
-        }, 500); // Esperar un poco para asegurar que el primer frame esté disponible
+    const img = document.createElement('img');
+    img.style.width = "100%";
+    img.style.borderRadius = "10px";
+    img.alt = "Miniatura del video";
+
+    video.addEventListener('loadeddata', async () => {
+        await delay(500); // 🔹 Espera un poco más para asegurarse de que el video esté cargado
+        video.currentTime = 0.1; // 🔹 Avanzamos un poco el video antes de capturar
+        video.addEventListener("seeked", function captureFrame() {
+            if (captureThumbnail(video, img)) {
+                video.removeEventListener("seeked", captureFrame); // 🔹 Captura exitosa, removemos el evento
+            } else {
+                console.log("🔹 Reintentando captura...");
+                video.currentTime += 0.1; // 🔹 Si salió negro, intentamos un poco más adelante
+            }
+        });
     });
 
     const buttonBar = document.createElement('div');
@@ -152,30 +163,43 @@ function showPreview(blob) {
     buttonBar.appendChild(acceptButton);
     buttonBar.appendChild(deleteButton);
 
+    previewPopup.appendChild(img); // 🔹 Mostramos la miniatura primero
     previewPopup.appendChild(video);
     previewPopup.appendChild(buttonBar);
     document.body.appendChild(previewPopup);
+
+    // Cuando se haga clic en la imagen, mostramos el video
+    img.addEventListener("click", () => {
+        img.style.display = "none";
+        video.style.display = "block";
+        video.play();
+    });
 }
 
-// Función para capturar un frame y usarlo como miniatura
-function captureThumbnail(video, previewPopup) {
+// Función para capturar una miniatura
+function captureThumbnail(video, imgElement) {
     const canvas = document.createElement('canvas');
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext('2d');
 
-    // Dibujar el primer frame del video en el canvas
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Convertir el canvas en una imagen y colocarla como miniatura
-    const img = document.createElement('img');
-    img.src = canvas.toDataURL('image/png');
-    img.style.width = "100%";
-    img.style.borderRadius = "10px";
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const allBlack = imageData.data.every(channel => channel === 0); // Comprobar si la imagen es negra
 
-    // Reemplazar el video con la imagen antes de que el usuario presione play
-    previewPopup.insertBefore(img, previewPopup.firstChild);
+    if (!allBlack) {
+        imgElement.src = canvas.toDataURL('image/png');
+        return true;
+    }
+    return false; // Si es negro, devolvemos falso y volvemos a intentarlo
 }
+
+// Función de espera
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 
 
