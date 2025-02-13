@@ -213,15 +213,23 @@ async function uploadToDrive(blob) {
     }
 }
 
-// 🔹 Función para mostrar el mensaje en pantalla durante 5 segundos con efecto fade out
 function mostrarMensaje(texto) {
+    // Si el mensaje ya está en pantalla, no lo volvemos a crear
+    if (document.getElementById("mensajeExito")) return;
+
     const mensaje = document.createElement("div");
     mensaje.id = "mensajeExito";
     mensaje.innerHTML = `<p>${texto}</p>`;
     document.body.appendChild(mensaje);
 
+    // 🔹 Iniciar la animación de fadeOut tras 8.5 segundos (para desaparecer suavemente a los 10s)
+    setTimeout(() => {
+        mensaje.style.animation = "fadeOut 1.5s ease-in-out forwards";
+    }, 8500);
+
+    // 🔹 Eliminar completamente el mensaje después de 10 segundos
     setTimeout(() => {
         mensaje.remove();
-    }, 10000); // 🔹 El mensaje desaparecerá después de 10 segundos
+    }, 10000);
 }
 

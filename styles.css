@@ -445,7 +445,7 @@ input[type="checkbox"] {
 
 @keyframes fadeOut {
     0% { opacity: 1; transform: translate(-50%, -50%); }
-    90% { opacity: 1; } /* 🔹 Mantiene el mensaje visible el 90% del tiempo */
-    100% { opacity: 0; transform: translate(-50%, -60%); }
+    100% { opacity: 0; transform: translate(-50%, -50%); }
+}
 }
 
