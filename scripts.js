@@ -118,7 +118,7 @@ function showPreview(blob) {
     const previewPopup = document.createElement('div');
     previewPopup.id = 'previewPopup';
     previewPopup.innerHTML = `
-        <video controls src="${url}"></video>
+        <video controls src="${url}" poster="${url}"></video>
         <div class="button-bar">
             <button id="acceptButton">Subir</button>
             <button id="deleteButton">Eliminar</button>
