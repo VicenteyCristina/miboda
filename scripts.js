@@ -118,7 +118,7 @@ function showPreview(blob) {
     const previewPopup = document.createElement('div');
     previewPopup.id = 'previewPopup';
     previewPopup.innerHTML = `
-        <video id="previewVideo" controls></video>
+        <video controls src="${url}"></video>
         <div class="button-bar">
             <button id="acceptButton">Subir</button>
             <button id="deleteButton">Eliminar</button>
@@ -126,16 +126,8 @@ function showPreview(blob) {
     `;
     document.body.appendChild(previewPopup);
 
-    const previewVideo = document.getElementById('previewVideo');
-
-    // Retraso para mejorar la carga de miniatura en algunos dispositivos
-    setTimeout(() => {
-        previewVideo.src = url;
-        previewVideo.load(); // Asegura que se procese correctamente el video
-    }, 5000); // Espera 1 segundo antes de asignar la fuente
-
     document.getElementById('acceptButton').addEventListener('click', () => {
-        uploadToDrive(blob);
+        uploadToDrive(blob); // ✅ Ahora usa la función corregida
         closePreview(previewPopup, overlay);
     });
 
@@ -144,7 +136,6 @@ function showPreview(blob) {
         closePreview(previewPopup, overlay);
     });
 }
-
 
 
 function closePreview(popup, overlay) {
