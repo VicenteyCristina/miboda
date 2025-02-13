@@ -447,5 +447,5 @@ input[type="checkbox"] {
     background: url("flores-derecha.png") no-repeat bottom right;
     background-size: contain;
     pointer-events: none;
-    z-index: -1; /* Para que no bloquee clics */
+    z-index: 3; /* Para que no bloquee clics */
 }
