@@ -2,13 +2,15 @@ body {
   font-family: Arial, sans-serif;
   background-color: #f8e7e6;
   margin: 0;
-  display: flex;
+  display: flex; /* 🔹 Cambiado a flex para permitir posiciones absolutas */
   flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
   overflow: hidden;
+  position: relative; /* 🔹 Necesario para que el z-index funcione bien */
 }
+
 
 header {
   background-color: #fbe8e7;
@@ -424,4 +426,23 @@ input[type="checkbox"] {
     100% { opacity: 0; transform: translate(-50%, -50%); }
 }
 }
-
+.decoracion-floral {
+    position: fixed; /* Fijada en la pantalla */
+    right: 0; /* Pegada al borde derecho */
+    bottom: 0; /* Pegada al borde inferior */
+    height: 100vh; /* Ocupará toda la altura de la pantalla */
+    width: auto; /* Mantiene la proporción de la imagen */
+    pointer-events: none; /* Evita que interfiera con clics */
+    z-index: 1; /* Se asegura de estar por encima del fondo */
+}body::before {
+    content: "";
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    width: 300px; /* Ajusta el ancho */
+    height: 100vh; /* Hace que ocupe toda la altura */
+    background: url("flores-derecha.png") no-repeat bottom right;
+    background-size: contain;
+    pointer-events: none;
+    z-index: -1; /* Para que no bloquee clics */
+}
