@@ -132,7 +132,7 @@ function showPreview(blob) {
     setTimeout(() => {
         previewVideo.src = url;
         previewVideo.load(); // Asegura que se procese correctamente el video
-    }, 3000); // Espera 1 segundo antes de asignar la fuente
+    }, 5000); // Espera 1 segundo antes de asignar la fuente
 
     document.getElementById('acceptButton').addEventListener('click', () => {
         uploadToDrive(blob);
