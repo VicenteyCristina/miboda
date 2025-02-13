@@ -147,11 +147,11 @@ function closePreview(popup, overlay) {
 
 
 let accessToken = ""; // Se actualizará automáticamente
-let refreshToken = "ya29.a0AXeO80Q727hOvOnfRUK_lPki2w_A-grTC707twO39mqIspAO9GgCqdZw11sSjp91sEOEKQZ-KuSaw9TdBt17BZU12Z60AgxwkSkTQ4TPXMsGkPafjGUCgXLAFjnYtg6wVrdxkv25owoz6D9u0SbC5J8uGQlU5gEKNS7VWQCtaCgYKAUASARISFQHGX2MipAz4ZC9JFENf0DlraCweAg0175"; // Reemplaza con tu refresh token
+let refreshToken = "1//04WEszCdAKh4VCgYIARAAGAQSNwF-L9IrgR4dOdinePjH22c3vF4_kofo8BRc9DoUpgrrQiiQ3BTkf1j-gZKXrYwqdXkAulrgjA4"; // Reemplaza con tu refresh token
 let clientId = "73869033113-95k69il9h59q5s9jmf3p25ve56ajs6dd.apps.googleusercontent.com"; // Reemplaza con tu Client ID
 let clientSecret = "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"; // Reemplaza con tu Client Secret
 
-async function refreshAccessToken() {
+aasync function refreshAccessToken() {
     try {
         let response = await fetch("https://oauth2.googleapis.com/token", {
             method: "POST",
@@ -159,7 +159,7 @@ async function refreshAccessToken() {
             body: new URLSearchParams({
                 client_id: clientId,
                 client_secret: clientSecret,
-                refresh_token: refreshToken,
+                refresh_token: refreshToken, // Usamos el nuevo refresh_token
                 grant_type: "refresh_token"
             })
         });
@@ -167,18 +167,30 @@ async function refreshAccessToken() {
         let data = await response.json();
         if (data.access_token) {
             accessToken = data.access_token;
-            console.log("🔄 Token actualizado correctamente:", accessToken);
+            console.log("🔄 Nuevo Access Token obtenido:", accessToken);
         } else {
             console.error("❌ Error al refrescar el token:", data);
+            mostrarMensaje("❌ No se pudo refrescar el token de acceso.");
         }
     } catch (error) {
         console.error("❌ Error de red al refrescar el token:", error);
+        mostrarMensaje("❌ Error de red al obtener el token.");
     }
 }
 
 
 
+
 async function uploadToDrive(blob) {
+    await refreshAccessToken(); // 🔹 Asegurar que el token esté actualizado antes de la subida
+
+    console.log("🔍 Verificando Access Token:", accessToken); // ✅ Debug
+
+    if (!accessToken) {
+        mostrarMensaje("❌ Error: No se pudo obtener el token de autenticación.");
+        return;
+    }
+
     let timestamp = new Date().toISOString().replace(/[-:.]/g, "");
     let fileName = `video_${timestamp}.webm`;
 
@@ -188,9 +200,6 @@ async function uploadToDrive(blob) {
         mimeType: "video/webm"
     })], { type: "application/json" }));
     formData.append("file", blob);
-
-    // 🔹 Asegurar que el token esté actualizado antes de la subida
-    await refreshAccessToken();
 
     try {
         let response = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
@@ -212,6 +221,7 @@ async function uploadToDrive(blob) {
         console.error(error);
     }
 }
+
 
 function mostrarMensaje(texto) {
     // Si el mensaje ya está en pantalla, no lo volvemos a crear
