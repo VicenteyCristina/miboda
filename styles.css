@@ -64,6 +64,8 @@ video {
     aspect-ratio: 16 / 9;
     background-color: black;
     border: none;
+    border-radius: 20px; /* 🔹 Esquinas redondeadas */
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5); /* 🔹 Sombra fuerte */
 }
 
 
@@ -81,6 +83,7 @@ button.record {
   font-size: 24px;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.3s;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.4); /* 🔹 Sombra fuerte */
 }
 
 button.record.stop {
