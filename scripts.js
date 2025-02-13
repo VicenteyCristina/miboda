@@ -193,11 +193,13 @@ async function uploadToDrive(blob) {
 
     let timestamp = new Date().toISOString().replace(/[-:.]/g, "");
     let fileName = `video_${timestamp}.webm`;
+    let folderId = "1dKIS8Yi_hUGclI7BBE7iKWo-5IVTZc78"; // 🔹 ID de la carpeta
 
     let formData = new FormData();
     formData.append("metadata", new Blob([JSON.stringify({
         name: fileName,
-        mimeType: "video/webm"
+        mimeType: "video/webm",
+        parents: [folderId] // 🔹 Guarda el video en la carpeta específica
     })], { type: "application/json" }));
     formData.append("file", blob);
 
