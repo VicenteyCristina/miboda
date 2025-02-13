@@ -434,7 +434,7 @@ input[type="checkbox"] {
     font-weight: bold;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
     z-index: 1000;
-    animation: fadeIn 0.5s ease-in-out, fadeOut 0.5s ease-in-out 4.5s;
+    animation: fadeIn 0.5s ease-in-out, fadeOut 1.5s ease-in-out 25s;
 }
 
 /* 🔹 Animaciones para entrada y salida del mensaje */
