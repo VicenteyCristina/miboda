@@ -412,13 +412,15 @@ input[type="checkbox"] {
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    font-size: 24px; /* 🔹 Aumentamos el tamaño del texto */
-    font-weight: bold; /* 🔹 Hacemos el texto más grueso */
-    color: #d45d79; /* 🔹 Mismo color que el resto del diseño */
+    font-size: 24px;
+    font-weight: bold;
+    color: #d45d79;
     max-width: 80%;
     z-index: 1000;
-    animation: fadeIn 0.5s ease-in-out, fadeOut 1.5s ease-in-out 10s; /* 🔹 fadeOut inicia a los 10s */
+    opacity: 1;
+    transition: opacity 2s ease-in-out; /* 🔹 Transición añadida */
 }
+
 
 
 /* 🔹 Animaciones para entrada y salida del mensaje */
@@ -452,3 +454,52 @@ input[type="checkbox"] {
     pointer-events: none;
     z-index: 3; /* Para que no bloquee clics */
 }
+#confettiCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none; /* 🔹 No bloquea clics */
+    z-index: 9999; /* 🔹 Por encima de todo */
+    background: transparent;
+}
+
+#countdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 🔹 Mantiene el centro fijo */
+    font-size: 180px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.6);
+    text-align: center;
+    z-index: 1001;
+    opacity: 0;
+    width: 300px;
+    height: 300px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+
+    /* 🔹 Fondo cinematográfico */
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 10%, rgba(0, 0, 0, 0.8) 90%);
+    border: 12px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.5);
+}
+
+
+@keyframes countdownAnimation {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.countdown-active {
+    animation: countdownAnimation 1s ease-in-out forwards;
+}
+
+

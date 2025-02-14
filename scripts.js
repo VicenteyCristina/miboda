@@ -51,7 +51,7 @@ async function iniciarCamara() {
 
 function toggleRecording() {
     if (!isRecording) {
-        startRecording();
+        startCountdown(); // 🔹 Inicia la cuenta regresiva antes de grabar
     } else {
         stopRecording();
     }
@@ -226,22 +226,174 @@ async function uploadToDrive(blob) {
 
 
 function mostrarMensaje(texto) {
-    // Si el mensaje ya está en pantalla, no lo volvemos a crear
-    if (document.getElementById("mensajeExito")) return;
+    let mensajeExistente = document.getElementById("mensajeExito");
+    if (mensajeExistente) mensajeExistente.remove();
 
     const mensaje = document.createElement("div");
     mensaje.id = "mensajeExito";
     mensaje.innerHTML = `<p>${texto}</p>`;
     document.body.appendChild(mensaje);
 
-    // 🔹 Iniciar la animación de fadeOut tras 8.5 segundos (para desaparecer suavemente a los 10s)
     setTimeout(() => {
-        mensaje.style.animation = "fadeOut 1.5s ease-in-out forwards";
-    }, 8500);
+        if (window.confetti) {
+            window.confetti.start(); // 🔥 Activa el confeti 🎉
+        } else {
+            console.error("❌ Confeti no está definido");
+        }
+    }, 500); // 🔹 Pequeño retraso para asegurar que el canvas esté listo
 
-    // 🔹 Eliminar completamente el mensaje después de 10 segundos
+    // 🔹 Iniciar desvanecimiento después de 8 segundos
+    setTimeout(() => {
+        mensaje.style.opacity = "0";
+        mensaje.style.transition = "opacity 2s ease-in-out"; // 🔥 Transición suave
+    }, 8000);
+
+    // 🔹 Eliminar el mensaje después de 10 segundos (cuando ya se desvaneció)
     setTimeout(() => {
         mensaje.remove();
     }, 10000);
 }
+
+
+
+class ConfettiParticle {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext("2d");
+
+        this.colors = ["#ff4081", "#4caf50", "#03a9f4", "#ffeb3b", "#ff9800", "#9c27b0"];
+        this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
+
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * -canvas.height;
+        this.size = Math.random() * 10 + 5;
+        this.speedY = Math.random() * 3 + 2;
+        this.speedX = Math.random() * 4 - 2;
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = Math.random() * 10 - 5;
+        this.opacity = 1;
+        this.fadeOut = false; // 🔹 Nuevo: define si la partícula debe desvanecerse
+    }
+
+    update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        this.rotation += this.rotationSpeed;
+
+        if (this.fadeOut) {
+            this.opacity -= 0.02; // 🔹 Se desvanece poco a poco
+        }
+
+        if (this.opacity <= 0) {
+            this.opacity = 0; // 🔹 Evita valores negativos
+        }
+    }
+
+    draw() {
+        const { ctx } = this;
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation * Math.PI / 180);
+        ctx.globalAlpha = this.opacity;
+        ctx.fillStyle = this.color;
+        ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+        ctx.restore();
+    }
+}
+
+
+class Confetti {
+    constructor() {
+        this.canvas = document.getElementById("confettiCanvas");
+        this.ctx = this.canvas.getContext("2d");
+        this.particles = [];
+        this.running = false;
+        this.resizeCanvas();
+
+        window.addEventListener("resize", () => this.resizeCanvas());
+    }
+
+    resizeCanvas() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+
+    start() {
+        this.particles = Array.from({ length: 300 }, () => new ConfettiParticle(this.canvas));
+        this.running = true;
+        this.animate();
+        setTimeout(() => this.beginFadeOut(), 5000); // 🔹 Después de 5s, inicia desvanecimiento
+    }
+
+    beginFadeOut() {
+        this.particles.forEach(particle => particle.fadeOut = true); // 🔹 Todas las partículas comienzan a desvanecerse
+
+        setTimeout(() => this.stop(), 3000); // 🔹 Espera 3s para borrar el canvas
+    }
+
+    stop() {
+        this.running = false;
+        setTimeout(() => {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }, 500);
+    }
+
+    animate() {
+        if (!this.running) return;
+
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.particles.forEach((particle) => {
+            particle.update();
+            particle.draw();
+        });
+
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+// 🔹 Asegurar que el confeti está listo al cargar
+document.addEventListener("DOMContentLoaded", () => {
+    window.confetti = new Confetti();
+});
+
+function startCountdown() {
+    let countdownElement = document.getElementById("countdown");
+    let recordButton = document.getElementById("recordButton");
+
+    countdownElement.style.display = "flex"; // 🔹 Se muestra al iniciar la cuenta
+    countdownElement.style.opacity = "1";
+    recordButton.disabled = true; // 🔹 Bloquea el botón mientras cuenta
+
+    let countdownNumbers = [5, 4, 3, 2, 1, "🎬"];
+    let index = 0;
+
+    function showNumber() {
+        if (index < countdownNumbers.length) {
+            countdownElement.innerText = countdownNumbers[index];
+            countdownElement.classList.add("countdown-active");
+
+            setTimeout(() => {
+                countdownElement.classList.remove("countdown-active");
+                index++;
+
+                if (index < countdownNumbers.length) {
+                    setTimeout(showNumber, 500); // 🔹 Añade una pausa entre números para fluidez
+                } else {
+                    setTimeout(() => {
+                        countdownElement.style.opacity = "0"; // 🔹 Se desvanece suavemente
+                        setTimeout(() => {
+                            countdownElement.style.display = "none"; // 🔹 Lo oculta después de desvanecerse
+                            countdownElement.style.opacity = "1"; // 🔹 Resetea la opacidad
+                            recordButton.disabled = false; // 🔹 Reactiva el botón
+                            startRecording(); // 🔥 Inicia la grabación correctamente
+                        }, 500);
+                    }, 500);
+                }
+            }, 1000);
+        }
+    }
+
+    showNumber();
+}
+
 
