@@ -360,9 +360,10 @@ function startCountdown() {
     let countdownElement = document.getElementById("countdown");
     let recordButton = document.getElementById("recordButton");
 
-    countdownElement.style.display = "flex"; // 🔹 Se muestra al iniciar la cuenta
+    countdownElement.style.display = "flex";
     countdownElement.style.opacity = "1";
-    recordButton.disabled = true; // 🔹 Bloquea el botón mientras cuenta
+    countdownElement.classList.add("flicker"); // 🔹 Agrega el efecto de parpadeo
+    recordButton.disabled = true;
 
     let countdownNumbers = [5, 4, 3, 2, 1, "🎬"];
     let index = 0;
@@ -377,15 +378,16 @@ function startCountdown() {
                 index++;
 
                 if (index < countdownNumbers.length) {
-                    setTimeout(showNumber, 500); // 🔹 Añade una pausa entre números para fluidez
+                    setTimeout(showNumber, 500);
                 } else {
                     setTimeout(() => {
-                        countdownElement.style.opacity = "0"; // 🔹 Se desvanece suavemente
+                        countdownElement.style.opacity = "0";
+                        countdownElement.classList.remove("flicker"); // 🔹 Elimina el efecto de parpadeo al terminar
                         setTimeout(() => {
-                            countdownElement.style.display = "none"; // 🔹 Lo oculta después de desvanecerse
-                            countdownElement.style.opacity = "1"; // 🔹 Resetea la opacidad
-                            recordButton.disabled = false; // 🔹 Reactiva el botón
-                            startRecording(); // 🔥 Inicia la grabación correctamente
+                            countdownElement.style.display = "none";
+                            countdownElement.style.opacity = "1";
+                            recordButton.disabled = false;
+                            startRecording();
                         }, 500);
                     }, 500);
                 }
@@ -395,5 +397,6 @@ function startCountdown() {
 
     showNumber();
 }
+
 
 
