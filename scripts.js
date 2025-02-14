@@ -236,19 +236,18 @@ function mostrarMensaje(texto) {
 
     setTimeout(() => {
         if (window.confetti) {
-            window.confetti.start(); // 🔥 Activa el confeti 🎉
+            window.confetti.start(); // 🎉 Activa el confeti
+            playConfettiExplosion(); // 🔊 Reproduce explosión de confeti
         } else {
             console.error("❌ Confeti no está definido");
         }
-    }, 500); // 🔹 Pequeño retraso para asegurar que el canvas esté listo
+    }, 500); // ⏳ Espera 500ms antes de activar todo para que se vea natural
 
-    // 🔹 Iniciar desvanecimiento después de 8 segundos
     setTimeout(() => {
         mensaje.style.opacity = "0";
-        mensaje.style.transition = "opacity 2s ease-in-out"; // 🔥 Transición suave
+        mensaje.style.transition = "opacity 2s ease-in-out";
     }, 8000);
 
-    // 🔹 Eliminar el mensaje después de 10 segundos (cuando ya se desvaneció)
     setTimeout(() => {
         mensaje.remove();
     }, 10000);
@@ -362,11 +361,12 @@ function startCountdown() {
 
     countdownElement.style.display = "flex";
     countdownElement.style.opacity = "1";
-    countdownElement.classList.add("flicker"); // 🔹 Agrega el efecto de parpadeo
     recordButton.disabled = true;
 
     let countdownNumbers = [5, 4, 3, 2, 1, "🎬"];
     let index = 0;
+
+    playTick(); // 🎶 Inicia el sonido de la cuenta regresiva solo una vez
 
     function showNumber() {
         if (index < countdownNumbers.length) {
@@ -378,25 +378,44 @@ function startCountdown() {
                 index++;
 
                 if (index < countdownNumbers.length) {
-                    setTimeout(showNumber, 500);
+                    setTimeout(showNumber, 250); // 🔥 Aún más rápido
                 } else {
                     setTimeout(() => {
+                        stopTick(); // ⏹️ Detiene el sonido de la cuenta atrás
                         countdownElement.style.opacity = "0";
-                        countdownElement.classList.remove("flicker"); // 🔹 Elimina el efecto de parpadeo al terminar
                         setTimeout(() => {
-                            countdownElement.style.display = "none";
+                            countdownElement.style.display = "none"; // 🔥 Ahora sí lo oculta completamente
                             countdownElement.style.opacity = "1";
                             recordButton.disabled = false;
                             startRecording();
-                        }, 500);
-                    }, 500);
+                        }, 100); // 🕒 Se oculta más rápido
+                    }, 100);
                 }
-            }, 1000);
+            }, 750); // 🔥 Se acelera la duración de cada número
         }
     }
 
     showNumber();
 }
 
+let tickAudio = new Audio('tic1.mp3'); // Carga el audio globalmente
+
+function playTick() {
+    tickAudio.loop = true; // 🔄 Se reproduce en bucle mientras dura la cuenta atrás
+    tickAudio.volume = 0.5;
+    tickAudio.play();
+}
+
+function stopTick() {
+    tickAudio.pause(); // ⏸ Detiene el sonido
+    tickAudio.currentTime = 0; // 🔄 Lo reinicia para la próxima vez
+}
+
+// 🔊 Función para reproducir el sonido de confeti
+function playConfettiExplosion() {
+    let confettiSound = new Audio('confeti.mp3');
+    confettiSound.volume = 0.6;
+    confettiSound.play();
+}
 
 
