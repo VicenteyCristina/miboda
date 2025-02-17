@@ -66,6 +66,7 @@ video {
     border: none;
     border-radius: 20px; /* 🔹 Esquinas redondeadas */
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.9); /* 🔹 Sombra fuerte */
+    filter: brightness(1.2) contrast(1.15) saturate(1.1) sharpen(0.8);
 }
 
 

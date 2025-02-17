@@ -40,14 +40,48 @@ function activarPantallaCompleta() {
 
 async function iniciarCamara() {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        const constraints = {
+            video: {
+                width: { ideal: 1920 },  // 📹 Intenta Full HD si la cámara lo soporta
+                height: { ideal: 1080 },
+                frameRate: { ideal: 30 }, // 🎞 Mayor fluidez
+                facingMode: "user",  // 🤳 Cámara frontal
+                exposureMode: "continuous", // 🌞 Ajuste automático de luz
+                whiteBalanceMode: "continuous", // 🌈 Corrige tonos azulados o amarillentos
+                focusMode: "continuous" // 🔥 Mantener el enfoque automático
+            },
+            audio: true,
+            powerLineCondition: "high-performance" // 🚀 Evita reducción de calidad en Android
+        };
+
+        // 🔹 Obtener el stream de video con los ajustes
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         const videoElement = document.getElementById('video');
         videoElement.srcObject = stream;
         videoElement.play();
+
+        // 🔹 Intentar ajustar manualmente la exposición y el balance de blancos si es compatible
+        const [track] = stream.getVideoTracks();
+        const capabilities = track.getCapabilities(); // 📌 Ver qué soporta la cámara
+
+        // 📌 Ajuste de exposición manual si la cámara lo permite
+        if (capabilities.exposureMode) {
+            await track.applyConstraints({ advanced: [{ exposureMode: "continuous" }] });
+            console.log("🌞 Ajuste automático de exposición activado");
+        }
+
+        // 📌 Ajuste de balance de blancos si la cámara lo permite
+        if (capabilities.whiteBalanceMode) {
+            await track.applyConstraints({ advanced: [{ whiteBalanceMode: "continuous" }] });
+            console.log("🌈 Ajuste automático de balance de blancos activado");
+        }
+
     } catch (error) {
         console.error("❌ No se pudo acceder a la cámara", error);
     }
 }
+
+
 
 function toggleRecording() {
     if (!isRecording) {
@@ -59,7 +93,12 @@ function toggleRecording() {
 
 async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    mediaRecorder = new MediaRecorder(stream);
+    const options = {
+    mimeType: 'video/webm; codecs=vp9', // 🎥 Mejor calidad de compresión
+    videoBitsPerSecond: 4_000_000 // 🚀 Más detalles sin pixelación
+};
+    mediaRecorder = new MediaRecorder(stream, options);
+
     videoChunks = [];
     mediaRecorder.start();
 
@@ -182,47 +221,45 @@ async function refreshAccessToken() {
 
 
 async function uploadToDrive(blob) {
+    // ⏳ Mostrar el mensaje de éxito de inmediato
+    mostrarMensaje("📩 ¡Mensaje recibido! No garantizamos que no lloraremos de emoción al verlo. 😭💖");
+
     await refreshAccessToken(); // 🔹 Asegurar que el token esté actualizado antes de la subida
 
-    console.log("🔍 Verificando Access Token:", accessToken); // ✅ Debug
-
     if (!accessToken) {
-        mostrarMensaje("❌ Error: No se pudo obtener el token de autenticación.");
+        console.error("❌ Error: No se pudo obtener el token de autenticación.");
         return;
     }
 
     let timestamp = new Date().toISOString().replace(/[-:.]/g, "");
     let fileName = `video_${timestamp}.webm`;
-    let folderId = "1dKIS8Yi_hUGclI7BBE7iKWo-5IVTZc78"; // 🔹 ID de la carpeta
+    let folderId = "1dKIS8Yi_hUGclI7BBE7iKWo-5IVTZc78"; // ID de la carpeta en Drive
 
     let formData = new FormData();
     formData.append("metadata", new Blob([JSON.stringify({
         name: fileName,
         mimeType: "video/webm",
-        parents: [folderId] // 🔹 Guarda el video en la carpeta específica
+        parents: [folderId]
     })], { type: "application/json" }));
     formData.append("file", blob);
 
-    try {
-        let response = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${accessToken}`,
-            },
-            body: formData
-        });
-
-        let result = await response.json();
-        if (response.ok) {
-            mostrarMensaje("📩 ¡Mensaje recibido! No garantizamos que no lloraremos de emoción al verlo. 😭💖");
-        } else {
-            mostrarMensaje(`❌ Error al subir: ${result.error.message}`);
+    // ⏳ Subir el archivo en segundo plano sin afectar la experiencia del usuario
+    fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${accessToken}` },
+        body: formData
+    }).then(response => response.json())
+    .then(result => {
+        if (!result.id) {
+            console.error("❌ Error al subir:", result);
+            mostrarMensaje("⚠️ El mensaje se recibió, pero hubo un problema al subir el video.");
         }
-    } catch (error) {
-        mostrarMensaje("❌ Error al conectar con Google Drive.");
-        console.error(error);
-    }
+    }).catch(error => {
+        console.error("❌ Error al conectar con Google Drive:", error);
+        mostrarMensaje("⚠️ El mensaje se recibió, pero hubo un problema con la subida.");
+    });
 }
+
 
 
 function mostrarMensaje(texto) {
