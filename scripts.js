@@ -46,8 +46,6 @@ async function iniciarCamara() {
                 height: { ideal: 1080 },
                 frameRate: { ideal: 30 }, // 🎞 Mayor fluidez
                 facingMode: "user",  // 🤳 Cámara frontal
-                exposureMode: "continuous", // 🌞 Ajuste automático de luz
-                whiteBalanceMode: "continuous", // 🌈 Corrige tonos azulados o amarillentos
                 focusMode: "continuous" // 🔥 Mantener el enfoque automático
             },
             audio: true,
@@ -59,6 +57,10 @@ async function iniciarCamara() {
         const videoElement = document.getElementById('video');
         videoElement.srcObject = stream;
         videoElement.play();
+
+        // 🔹 Evitar zoom raro y asegurar que el video encaje bien en su cuadro
+        videoElement.style.transform = "scale(1)";
+        videoElement.style.objectFit = "cover";
 
         // 🔹 Intentar ajustar manualmente la exposición y el balance de blancos si es compatible
         const [track] = stream.getVideoTracks();
