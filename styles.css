@@ -55,20 +55,18 @@ main {
 
 video {
     position: relative;
-    z-index: 2; /* 🔹 El video queda debajo de las flores */
-    width: 90%;  /* 🔹 Ajusta el tamaño del video dentro del contenedor */
-    max-width: 800px;  /* 🔹 No crece más de 800px para evitar que se haga enorme */
-    height: auto;
+    z-index: 2; /* El video queda debajo de las flores */
+    width: 100%;
+    height: 100%;
+    max-width: 100vw;
     max-height: 100vh;
-    object-fit: cover; /* 🔹 Asegura que la imagen encaje bien sin distorsionarse */
+    object-fit: cover;
     aspect-ratio: 16 / 9;
     background-color: black;
     border: none;
-    border-radius: 20px; /* 🔹 Mantiene esquinas redondeadas */
+    border-radius: 20px; /* 🔹 Esquinas redondeadas */
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.9); /* 🔹 Sombra fuerte */
-    filter: brightness(1.2) contrast(1.15) saturate(1.1);
 }
-
 
 
 button.record {

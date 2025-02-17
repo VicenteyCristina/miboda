@@ -40,50 +40,14 @@ function activarPantallaCompleta() {
 
 async function iniciarCamara() {
     try {
-        const constraints = {
-            video: {
-                width: { ideal: 1920 },  // 📹 Intenta Full HD si la cámara lo soporta
-                height: { ideal: 1080 },
-                frameRate: { ideal: 30 }, // 🎞 Mayor fluidez
-                facingMode: "user",  // 🤳 Cámara frontal
-                focusMode: "continuous" // 🔥 Mantener el enfoque automático
-            },
-            audio: true,
-            powerLineCondition: "high-performance" // 🚀 Evita reducción de calidad en Android
-        };
-
-        // 🔹 Obtener el stream de video con los ajustes
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         const videoElement = document.getElementById('video');
         videoElement.srcObject = stream;
         videoElement.play();
-
-        // 🔹 Evitar zoom raro y asegurar que el video encaje bien en su cuadro
-        videoElement.style.transform = "scale(1)";
-        videoElement.style.objectFit = "cover";
-
-        // 🔹 Intentar ajustar manualmente la exposición y el balance de blancos si es compatible
-        const [track] = stream.getVideoTracks();
-        const capabilities = track.getCapabilities(); // 📌 Ver qué soporta la cámara
-
-        // 📌 Ajuste de exposición manual si la cámara lo permite
-        if (capabilities.exposureMode) {
-            await track.applyConstraints({ advanced: [{ exposureMode: "continuous" }] });
-            console.log("🌞 Ajuste automático de exposición activado");
-        }
-
-        // 📌 Ajuste de balance de blancos si la cámara lo permite
-        if (capabilities.whiteBalanceMode) {
-            await track.applyConstraints({ advanced: [{ whiteBalanceMode: "continuous" }] });
-            console.log("🌈 Ajuste automático de balance de blancos activado");
-        }
-
     } catch (error) {
         console.error("❌ No se pudo acceder a la cámara", error);
     }
 }
-
-
 
 function toggleRecording() {
     if (!isRecording) {
@@ -95,12 +59,7 @@ function toggleRecording() {
 
 async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    const options = {
-    mimeType: 'video/webm; codecs=vp9', // 🎥 Mejor calidad de compresión
-    videoBitsPerSecond: 4_000_000 // 🚀 Más detalles sin pixelación
-};
-    mediaRecorder = new MediaRecorder(stream, options);
-
+    mediaRecorder = new MediaRecorder(stream);
     videoChunks = [];
     mediaRecorder.start();
 
