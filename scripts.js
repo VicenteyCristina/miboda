@@ -40,14 +40,42 @@ function activarPantallaCompleta() {
 
 async function iniciarCamara() {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        const constraints = {
+            video: {
+                width: { ideal: 1920 },
+                height: { ideal: 1080 },
+                frameRate: { ideal: 30 },
+                facingMode: "user",
+                focusMode: "manual"  // 🔹 Fijamos el enfoque (porque es "fixed")
+            },
+            audio: true
+        };
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         const videoElement = document.getElementById('video');
         videoElement.srcObject = stream;
         videoElement.play();
+
+        // 🔹 Ajustar Exposición y Balance de Blancos si la tablet lo soporta
+        const [track] = stream.getVideoTracks();
+        const capabilities = track.getCapabilities();
+
+        if (capabilities.exposureMode) {
+            await track.applyConstraints({ advanced: [{ exposureMode: "locked" }] });
+            console.log("🌞 Exposición bloqueada para mayor estabilidad");
+        }
+
+        if (capabilities.whiteBalanceMode) {
+            await track.applyConstraints({ advanced: [{ whiteBalanceMode: "locked" }] });
+            console.log("🌈 Balance de blancos bloqueado para evitar cambios de color");
+        }
+
     } catch (error) {
         console.error("❌ No se pudo acceder a la cámara", error);
     }
 }
+
+
 
 function toggleRecording() {
     if (!isRecording) {
@@ -59,7 +87,12 @@ function toggleRecording() {
 
 async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    mediaRecorder = new MediaRecorder(stream);
+    const options = {
+    mimeType: 'video/webm; codecs=vp9', // 🎥 Mejor calidad de compresión
+    videoBitsPerSecond: 4_000_000 // 🚀 Más detalles sin pixelación
+};
+    mediaRecorder = new MediaRecorder(stream, options);
+
     videoChunks = [];
     mediaRecorder.start();
 
