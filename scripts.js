@@ -42,11 +42,11 @@ async function iniciarCamara() {
     try {
         const constraints = {
             video: {
-                width: { ideal: 1920 },
-                height: { ideal: 1080 },
-                frameRate: { ideal: 30 },
+                width: { ideal: 1280 },  // 🔹 Bajamos a 1280x720 para menos lag
+                height: { ideal: 720 },
+                frameRate: { ideal: 25, max: 25 }, // 🎞🔹 Bajamos FPS a 25 para más fluidez
                 facingMode: "user",
-                focusMode: "manual"  // 🔹 Fijamos el enfoque (porque es "fixed")
+                focusMode: "manual"
             },
             audio: true
         };
@@ -56,24 +56,11 @@ async function iniciarCamara() {
         videoElement.srcObject = stream;
         videoElement.play();
 
-        // 🔹 Ajustar Exposición y Balance de Blancos si la tablet lo soporta
-        const [track] = stream.getVideoTracks();
-        const capabilities = track.getCapabilities();
-
-        if (capabilities.exposureMode) {
-            await track.applyConstraints({ advanced: [{ exposureMode: "locked" }] });
-            console.log("🌞 Exposición bloqueada para mayor estabilidad");
-        }
-
-        if (capabilities.whiteBalanceMode) {
-            await track.applyConstraints({ advanced: [{ whiteBalanceMode: "locked" }] });
-            console.log("🌈 Balance de blancos bloqueado para evitar cambios de color");
-        }
-
     } catch (error) {
         console.error("❌ No se pudo acceder a la cámara", error);
     }
 }
+
 
 
 
