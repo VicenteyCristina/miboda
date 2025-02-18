@@ -40,29 +40,14 @@ function activarPantallaCompleta() {
 
 async function iniciarCamara() {
     try {
-        const constraints = {
-            video: {
-                width: { ideal: 1280 },  // 🔹 Bajamos a 1280x720 para menos lag
-                height: { ideal: 720 },
-                frameRate: { ideal: 25, max: 25 }, // 🎞🔹 Bajamos FPS a 25 para más fluidez
-                facingMode: "user",
-                focusMode: "manual"
-            },
-            audio: true
-        };
-
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         const videoElement = document.getElementById('video');
         videoElement.srcObject = stream;
         videoElement.play();
-
     } catch (error) {
         console.error("❌ No se pudo acceder a la cámara", error);
     }
 }
-
-
-
 
 function toggleRecording() {
     if (!isRecording) {
@@ -74,12 +59,7 @@ function toggleRecording() {
 
 async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    const options = {
-    mimeType: 'video/webm; codecs=vp9', // 🎥 Mejor calidad de compresión
-    videoBitsPerSecond: 4_000_000 // 🚀 Más detalles sin pixelación
-};
-    mediaRecorder = new MediaRecorder(stream, options);
-
+    mediaRecorder = new MediaRecorder(stream);
     videoChunks = [];
     mediaRecorder.start();
 
