@@ -154,7 +154,7 @@ async function getServiceAccountToken(){
 }
 
 async function uploadToDrive(blob){
-  mostrarMensaje("📩 ¡Mensaje recibido! Subiendo…");
+  mostrarMensaje("📩 ¡Mensaje recibido! No garantizamos que no lloraremos de emoción al verlo. 😭💖");
   let token;
   try {
     token = await getServiceAccountToken();
