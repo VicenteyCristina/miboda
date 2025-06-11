@@ -1,228 +1,192 @@
 console.log("✅ Script cargado correctamente");
 
-let isRecording = false;
-let mediaRecorder;
-let videoChunks = [];
-let recordingTimer;
-let timeLeft = 120; // 2 minutos
+let isRecording = false, mediaRecorder, recordingTimer;
+let videoChunks = [], timeLeft = 120; // 2 minutos
 
-// 🔹 Iniciar pantalla completa al cargar la app
+// —————————————————————
+// ► CONFIGURACIÓN SERVICE ACCOUNT
+// —————————————————————
+const SERVICE_ACCOUNT = {
+  type: "service_account",
+  project_id: "miboda-450811",
+  private_key_id: "3d63e94e89b4e18be28725234a1620617bb0c7a0",
+  private_key: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC/FSEUlAYTd+wD\nz2xkl/i9NeGtfRcUrrNGOjFLVW1nD1ik85VzISWk9oFvc3f0pkJA1Qi0RJC7X72y\nFZPC9axPdb+xdeWbTS5NnhwUjTOQy6p8TVfIakuvKZWa66qBY8p359iU+2mZTrks\nK0YcuPs/aXGV+FSBMAD4VScsxRavkJ34X56n2EPlZICRvGFo01zZI459kBHMUPw9\nByfWUc7ZIXvLJy5R7391oOg1vNqxr0sdmTPN+LlH+9d9UR59Yz2VjiTgD6o05I07\n35/fqznsJXZlmBd6yA9EcFy+N6rFj1b1oYnpbVn0AsLpF+vqlN7YVxIh0qlldiLs\nQ1bgF+QJAgMBAAECggEACJXJ8TM/XKOQMpGgtJpRXirsE0/h+BdrTZXyvgg+DJnX\naT3acpxEJTfAFAJTmuXXZzNLG1JTUF/aVYR7qZBBKCbJsI7z/HjIwkr+xvubG//S\njpgpAAOql9md86Jv/DVAFQgRJoxvL6imUDI3ibXT8ALsTAkmvtEp0f59bpkCTmv0\nhi28fGXv/+lEiOdQMYpqR4EcAF+K2USav+5q63MmlX/9EzC3Kyi0TIZGkquexOWi\nv7gYsk/qzggm2DPHL1asQyXlrgVAki3hZPG9IcSAtH6UOwCS3aqNSJxs4+LxJ8M8\n/OYlx6fN/AFlcL5c4Nj0izQK0oPjtdVkb+aJ6RNmSwKBgQDu0z9vJIkYo10mEjKb\npu8Ad0Z3O2geK4JMAW1te//FcL9Z8W5/YLrvtM38gt+9LxftQUagfEzPgxlIf/B1\nF1ZwjCCC9AdpGxCx2JobLsPjpwwCSRigJLRfRO8b7r+JLI0MVwBicdnocB7esX57\nYqO06jVV5lcqwR7vsMEHyqfv7wKBgQDM0vFwqgFHLewD2IlJLrvRdNOdG1UvgQjD\nkwGBgSJCYo1K0/VAJVaEFUgF1FHL3s0gn27tAeSAh8/rmG1zs7OL47mic2gOYFdv\n2ycVA4e0FI+svy7W0iZiY20gRGCF3gGpPmqraxerb1a/CZSwzmEcWn9ISl/e/1wW\nu8suu0BzhwKBgQDXhV+rZucpitNWtflhqeXpH7pBgyTUhSMSf/9GXC5W+QZVnqC+\n5oYMJ7fz9g7+5O7MtqmLzmBqq743RO20XRkue+YjByFg4oHQXM3FVhCE8ozNyzUj\n37u+dbDqHixPGBs5VZINRP0G25egE8E2i698Zhc3q6Rh+uF2IKYx59phlQKBgAF9\no447XokDF42rnMwwj+NlY0jocwVGfibWQhOMOhCboQWjZ0yROQD7GqwYMIQ4Wevb\n3TXSZrRcyLGhSWKnMy5YePhquJ4qK1jAEpe/j9RKtgT+2ztrCiZ7LMcoWD+BLyfp\nMWOQAvsXc10ul6t1xRUsv3JqQCpiV2w+76qmaECvAoGATzljBr45mZSZPP2ywsQe\nkcd8z4FAIqoQR1FjLzaR2eHEfd5rB5o08oyihR9pzLz//ys6lV56QDWmhPADWdRO\nIg3u++RDnqeOzsvFDG/P2citaq1+okWrNNsQFW1K7UQ1Yd1oZJvpSZmC3gru6ycB\nA2PS/AR5e0wCYrcx5OWwglc=\n-----END PRIVATE KEY-----\n",
+  client_email: "bodaservicio@miboda-450811.iam.gserviceaccount.com",
+  token_uri: "https://oauth2.googleapis.com/token"
+};
+
+const DRIVE_UPLOAD_URL = "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart";
+const FOLDER_ID = "1dKIS8Yi_hUGclI7BBE7iKWo-5IVTZc78";
+
+// —————————————————————
+// ► FULLSCREEN + CÁMARA
+// —————————————————————
 document.addEventListener("DOMContentLoaded", () => {
-    activarPantallaCompleta();
-    iniciarCamara();
-    document.getElementById('recordButton').addEventListener('click', toggleRecording);
+  activarPantallaCompleta();
+  iniciarCamara();
+  document.getElementById("recordButton").addEventListener("click", toggleRecording);
 });
-
-document.addEventListener("click", activarPantallaCompleta);
-
+document.addEventListener("click",            activarPantallaCompleta);
 document.addEventListener("fullscreenchange", () => {
-    if (!document.fullscreenElement) activarPantallaCompleta();
+  if (!document.fullscreenElement) activarPantallaCompleta();
 });
-
 document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible" && !document.fullscreenElement) activarPantallaCompleta();
+  if (document.visibilityState==="visible" && !document.fullscreenElement)
+    activarPantallaCompleta();
 });
 
 function activarPantallaCompleta() {
-    let elem = document.documentElement;
-    if (!document.fullscreenElement) {
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.mozRequestFullScreen) {
-            elem.mozRequestFullScreen();
-        } else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
-        }
-    }
+  const e = document.documentElement;
+  if (!document.fullscreenElement) {
+    (e.requestFullscreen   ||
+     e.mozRequestFullScreen||
+     e.webkitRequestFullscreen||
+     e.msRequestFullscreen).call(e);
+  }
 }
 
 async function iniciarCamara() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        const videoElement = document.getElementById('video');
-        videoElement.srcObject = stream;
-        videoElement.play();
-    } catch (error) {
-        console.error("❌ No se pudo acceder a la cámara", error);
-    }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    document.getElementById("video").srcObject = stream;
+  } catch(e) {
+    console.error("❌ No se pudo acceder a la cámara", e);
+  }
 }
 
+// —————————————————————
+// ► GRABACIÓN Y CUENTA ATRÁS
+// —————————————————————
 function toggleRecording() {
-    if (!isRecording) {
-        startCountdown(); // 🔹 Inicia la cuenta regresiva antes de grabar
-    } else {
-        stopRecording();
-    }
+  isRecording ? stopRecording() : startCountdown();
 }
 
 async function startRecording() {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    mediaRecorder = new MediaRecorder(stream);
-    videoChunks = [];
-    mediaRecorder.start();
-
-    mediaRecorder.ondataavailable = (e) => videoChunks.push(e.data);
-    mediaRecorder.onstop = () => {
-        clearInterval(recordingTimer);
-        timeLeft = 120;
-        updateTimerDisplay();
-        const videoBlob = new Blob(videoChunks, { type: 'video/webm' });
-        videoChunks = [];
-        showPreview(videoBlob);
-    };
-
-    document.getElementById('recordButton').classList.add('stop');
-    isRecording = true;
-    updateTimerDisplay();
-
-    recordingTimer = setInterval(() => {
-        timeLeft--;
-        updateTimerDisplay();
-        if (timeLeft <= 0) {
-            stopRecording();
-        }
-    }, 1000);
-}
-
-function stopRecording() {
-    mediaRecorder.stop();
-    document.getElementById('recordButton').classList.remove('stop');
-    isRecording = false;
+  const stream = await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+  mediaRecorder = new MediaRecorder(stream);
+  videoChunks = [];
+  mediaRecorder.start();
+  mediaRecorder.ondataavailable = e => videoChunks.push(e.data);
+  mediaRecorder.onstop = () => {
     clearInterval(recordingTimer);
     timeLeft = 120;
     updateTimerDisplay();
+    showPreview(new Blob(videoChunks,{type:"video/webm"}));
+  };
+  document.getElementById("recordButton").classList.add("stop");
+  isRecording = true;
+  updateTimerDisplay();
+  recordingTimer = setInterval(() => {
+    timeLeft--; updateTimerDisplay();
+    if (timeLeft<=0) stopRecording();
+  },1000);
 }
 
-function updateTimerDisplay() {
-    const recordButton = document.getElementById("recordButton");
-    if (isRecording) {
-        let minutes = Math.floor(timeLeft / 60);
-        let seconds = timeLeft % 60;
-        recordButton.innerHTML = `<span>${minutes}:${seconds < 10 ? "0" : ""}${seconds}</span>`;
-    } else {
-        recordButton.innerHTML = "<span>Grabar</span>";
+function stopRecording(){
+  mediaRecorder.stop();
+  document.getElementById("recordButton").classList.remove("stop");
+  isRecording = false;
+  clearInterval(recordingTimer);
+  timeLeft=120; updateTimerDisplay();
+}
+
+function updateTimerDisplay(){
+  const btn = document.getElementById("recordButton");
+  if(isRecording){
+    const m=Math.floor(timeLeft/60), s=timeLeft%60;
+    btn.innerHTML=`<span>${m}:${s<10?"0":""}${s}</span>`;
+  } else {
+    btn.innerHTML=`<span>Grabar</span>`;
+  }
+}
+
+// —————————————————————
+// ► VISTA PREVIA + SUBIDA
+// —————————————————————
+function showPreview(blob){
+  const url    = URL.createObjectURL(blob),
+        overlay= document.createElement("div"),
+        popup  = document.createElement("div");
+  overlay.id="overlay"; document.body.append(overlay);
+  popup.id="previewPopup";
+  popup.innerHTML=`
+    <video controls src="${url}"></video>
+    <div class="button-bar">
+      <button id="acceptButton">Subir</button>
+      <button id="deleteButton">Eliminar</button>
+    </div>`;
+  document.body.append(popup);
+  document.getElementById("acceptButton").onclick = () => {
+    uploadToDrive(blob); closePreview(popup,overlay);
+  };
+  document.getElementById("deleteButton").onclick = () => {
+    URL.revokeObjectURL(url); closePreview(popup,overlay);
+  };
+}
+function closePreview(p,pop){ pop.remove(); p.remove(); }
+
+// —————————————————————
+// ► JWT & SUBIDA A DRIVE
+// —————————————————————
+async function getServiceAccountToken(){
+  const now = KJUR.jws.IntDate.get("now"),
+        payload = {
+          iss: SERVICE_ACCOUNT.client_email,
+          scope: "https://www.googleapis.com/auth/drive.file",
+          aud: SERVICE_ACCOUNT.token_uri,
+          exp: now+3600,
+          iat: now
+        },
+        header = { alg:"RS256",typ:"JWT" },
+        jwt    = KJUR.jws.JWS.sign("RS256",JSON.stringify(header),JSON.stringify(payload),SERVICE_ACCOUNT.private_key),
+        params = new URLSearchParams({
+          grant_type:"urn:ietf:params:oauth:grant-type:jwt-bearer",
+          assertion:jwt
+        }),
+        res    = await fetch(SERVICE_ACCOUNT.token_uri,{
+                   method:"POST",
+                   headers:{"Content-Type":"application/x-www-form-urlencoded"},
+                   body:params
+                 }),
+        data   = await res.json();
+  if(!data.access_token) throw new Error("No access_token");
+  return data.access_token;
+}
+
+async function uploadToDrive(blob){
+  mostrarMensaje("📩 ¡Mensaje recibido! Subiendo…");
+  let token;
+  try {
+    token = await getServiceAccountToken();
+  } catch(e){
+    console.error("❌ Auth error:",e);
+    mostrarMensaje("⚠️ No se pudo autenticar con Drive.");
+    return;
+  }
+  const filename   = `video_${new Date().toISOString().replace(/[-:.]/g,"")}.webm`,
+        form        = new FormData();
+  form.append("metadata",new Blob([JSON.stringify({name:filename,parents:[FOLDER_ID]})],{type:"application/json"}));
+  form.append("file",blob);
+  try {
+    const res = await fetch(DRIVE_UPLOAD_URL,{
+                  method:"POST",
+                  headers:{Authorization:`Bearer ${token}`},
+                  body:form
+                }),
+          json = await res.json();
+    if(!json.id){
+      console.error("❌ Upload error:",json);
+      mostrarMensaje("⚠️ Problema al subir el vídeo.");
     }
+  } catch(err){
+    console.error("❌ Fetch error:",err);
+    mostrarMensaje("⚠️ No se pudo conectar con el servidor.");
+  }
 }
 
-
-
-
-function showPreview(blob) {
-    const url = URL.createObjectURL(blob);
-    const overlay = document.createElement('div');
-    overlay.id = 'overlay';
-    document.body.appendChild(overlay);
-
-    const previewPopup = document.createElement('div');
-    previewPopup.id = 'previewPopup';
-    previewPopup.innerHTML = `
-        <video controls src="${url}"></video>
-        <div class="button-bar">
-            <button id="acceptButton">Subir</button>
-            <button id="deleteButton">Eliminar</button>
-        </div>
-    `;
-    document.body.appendChild(previewPopup);
-
-    document.getElementById('acceptButton').addEventListener('click', () => {
-        uploadToDrive(blob); // ✅ Ahora usa la función corregida
-        closePreview(previewPopup, overlay);
-    });
-
-    document.getElementById('deleteButton').addEventListener('click', () => {
-        URL.revokeObjectURL(url);
-        closePreview(previewPopup, overlay);
-    });
-}
-
-
-function closePreview(popup, overlay) {
-    popup.remove();
-    overlay.remove();
-}
-
-
-
-
-let accessToken = ""; // Se actualizará automáticamente
-let refreshToken = "1//04WEszCdAKh4VCgYIARAAGAQSNwF-L9IrgR4dOdinePjH22c3vF4_kofo8BRc9DoUpgrrQiiQ3BTkf1j-gZKXrYwqdXkAulrgjA4"; // Reemplaza con tu refresh token
-let clientId = "73869033113-95k69il9h59q5s9jmf3p25ve56ajs6dd.apps.googleusercontent.com"; // Reemplaza con tu Client ID
-let clientSecret = "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"; // Reemplaza con tu Client Secret
-
-async function refreshAccessToken() {
-    try {
-        let response = await fetch("https://oauth2.googleapis.com/token", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({
-                client_id: clientId,
-                client_secret: clientSecret,
-                refresh_token: refreshToken, // Usamos el nuevo refresh_token
-                grant_type: "refresh_token"
-            })
-        });
-
-        let data = await response.json();
-        if (data.access_token) {
-            accessToken = data.access_token;
-            console.log("🔄 Nuevo Access Token obtenido:", accessToken);
-        } else {
-            console.error("❌ Error al refrescar el token:", data);
-            mostrarMensaje("❌ No se pudo refrescar el token de acceso.");
-        }
-    } catch (error) {
-        console.error("❌ Error de red al refrescar el token:", error);
-        mostrarMensaje("❌ Error de red al obtener el token.");
-    }
-}
-
-
-
-
-async function uploadToDrive(blob) {
-    // ⏳ Mostrar el mensaje de éxito de inmediato
-    mostrarMensaje("📩 ¡Mensaje recibido! No garantizamos que no lloraremos de emoción al verlo. 😭💖");
-
-    await refreshAccessToken(); // 🔹 Asegurar que el token esté actualizado antes de la subida
-
-    if (!accessToken) {
-        console.error("❌ Error: No se pudo obtener el token de autenticación.");
-        return;
-    }
-
-    let timestamp = new Date().toISOString().replace(/[-:.]/g, "");
-    let fileName = `video_${timestamp}.webm`;
-    let folderId = "1dKIS8Yi_hUGclI7BBE7iKWo-5IVTZc78"; // ID de la carpeta en Drive
-
-    let formData = new FormData();
-    formData.append("metadata", new Blob([JSON.stringify({
-        name: fileName,
-        mimeType: "video/webm",
-        parents: [folderId]
-    })], { type: "application/json" }));
-    formData.append("file", blob);
-
-    // ⏳ Subir el archivo en segundo plano sin afectar la experiencia del usuario
-    fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${accessToken}` },
-        body: formData
-    }).then(response => response.json())
-    .then(result => {
-        if (!result.id) {
-            console.error("❌ Error al subir:", result);
-            mostrarMensaje("⚠️ El mensaje se recibió, pero hubo un problema al subir el video.");
-        }
-    }).catch(error => {
-        console.error("❌ Error al conectar con Google Drive:", error);
-        mostrarMensaje("⚠️ El mensaje se recibió, pero hubo un problema con la subida.");
-    });
-}
-
-
-
+// —————————————————————
+// ► AUXILIARES (alerta, confeti, cuenta atrás…)
+// —————————————————————
 function mostrarMensaje(texto) {
     let mensajeExistente = document.getElementById("mensajeExito");
     if (mensajeExistente) mensajeExistente.remove();
@@ -415,5 +379,3 @@ function playConfettiExplosion() {
     confettiSound.volume = 0.6;
     confettiSound.play();
 }
-
-
